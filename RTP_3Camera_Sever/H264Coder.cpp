@@ -23,6 +23,8 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     AVCodec *codec;  
     AVCodecContext *c= NULL;  
     int i, ret, x, y, got_output;  
+	int iColorWidth =  1280;
+	int iColorHeight =  720;
 
     AVFrame *frame;  
     AVPacket pkt;  
@@ -54,8 +56,8 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     /* resolution must be a multiple of two */  
     //c->width  = uiWidth;  
     //c->height = uiHeight;//影片的宽度和高度  
-	c->width  = img->width;  
-	c->height = img->height;//影片的宽度和高度 
+	c->width = iColorWidth;
+	c->height = iColorHeight;//影片的宽度和高度 
     /* frames per second */  
     AVRational  a={1,25};//本人未查到这个AVRational结构体的意义。，根据上面的英文猜测，为：1秒钟播放25帧。  
     c->time_base=a;                //每秒25帧
@@ -77,7 +79,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     }  
   
 	AVFrame* pic_BGR = avcodec_alloc_frame();
-	SwsContext* swc_BGR2YUV = sws_getContext(img->width, img->height, PIX_FMT_BGR24, img->width, img->height, PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
+	SwsContext* swc_BGR2YUV = sws_getContext(iColorWidth, iColorHeight, PIX_FMT_BGR24, iColorWidth, iColorHeight, PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
 	//-----------initial encode para---------end
 	//-----------initial decode para-------------start	
 	//avcodec_register_all();
@@ -92,8 +94,8 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 	/*初始化CODEC的默认参数*/
 	c1 = avcodec_alloc_context3(codec);
 	c1->max_b_frames = 0;
-	c1->width = img->width;
-	c1->height = img->height;
+	c1->width = iColorHeight;
+	c1->height = iColorHeight;
 	//if (c1->priv_data){}
 	if (!c1)
 		return;
@@ -104,11 +106,11 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 
 	//int i;
 	AVFrame * picture1 = avcodec_alloc_frame();
-	static IplImage* bgrImg1 = cvCreateImage(cvSize(c1->width, c1->height), IPL_DEPTH_8U, 3);  //有问题，不能有效传递长宽
+	static IplImage* bgrImg1 = cvCreateImage(cvSize(iColorWidth, iColorHeight), IPL_DEPTH_8U, 3);  //有问题，不能有效传递长宽
 	if (!picture1)
 		return;
 	AVFrame* pic_BGR2 = avcodec_alloc_frame();
-	SwsContext* swc_YUV2BGR = sws_getContext(bgrImg1->width, bgrImg1->height, PIX_FMT_YUV420P, bgrImg1->width, bgrImg1->height, PIX_FMT_BGR24, SWS_POINT, NULL, NULL, NULL); //init swscontext
+	SwsContext* swc_YUV2BGR = sws_getContext(iColorWidth, iColorHeight, PIX_FMT_YUV420P, iColorWidth, iColorHeight, PIX_FMT_BGR24, SWS_POINT, NULL, NULL, NULL); //init swscontext
 	//------------initial decode para------------end
     frame = avcodec_alloc_frame();//给frame结构体分配内存。，但并为给frame->data分配内存。  
     if (!frame) {  
@@ -123,18 +125,22 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 	
     /* the image can be allocated by any means and av_image_alloc() is 
      * just the most convenient way if av_malloc() is to be used */  
-    ret = av_image_alloc(frame->data, frame->linesize, c->width, c->height,  c->pix_fmt, 32);   //实际分配内存。与前面的avcodec_alloc_frame()函数配合使用。  
+	ret = av_image_alloc(frame->data, frame->linesize, iColorWidth, iColorHeight, c->pix_fmt, 64);   //实际分配内存。与前面的avcodec_alloc_frame()函数配合使用。  
     if (ret < 0) {//  
         AfxMessageBox(_T("Could not allocate raw picture buffer\n"));//分配内存失败。  
         exit(1);  
     }  
     	
 	unsigned int count=0;  //pts 计数
-
+	cv::Size displaySize(iColorWidth, iColorHeight);	
+	cv::Mat mat2;
+	cv::Mat matout(displaySize, CV_8UC4);
     /* encode YUV */  
     while(true) //这里写入200帧的数据。200/25=8,,,因此产生了8s的影片。
 	{
 		img = cvQueryFrame(capture);
+		mat2 = img;
+		cv::resize(mat2, matout, displaySize,0,0,2);
 		EnterCriticalSection(&CriticalSection);
 
 		//-----------encode start
@@ -149,9 +155,9 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		DWORD start_time = GetTickCount(); //计时
 		
 
-		avpicture_fill((AVPicture*)pic_BGR, (uint8_t*)img->imageData, PIX_FMT_BGR24, img->width, img->height);               //img->pic_BGR
+		avpicture_fill((AVPicture*)pic_BGR, (uint8_t*)matout.data, PIX_FMT_BGR24, iColorWidth, iColorHeight);               //img->pic_BGR
 		
-		sws_scale(swc_BGR2YUV, pic_BGR->data, pic_BGR->linesize, 0, c->height, frame->data, frame->linesize );   //rgb转yuv，从pic_BGR到frame		
+		sws_scale(swc_BGR2YUV, pic_BGR->data, pic_BGR->linesize, 0, iColorHeight, frame->data, frame->linesize);   //rgb转yuv，从pic_BGR到frame		
 
 		
 		//delete [] imageConverted.pData;
@@ -167,13 +173,13 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		//--------decode-------start		
 		consumed_bytes = avcodec_decode_video2(c1, picture1, &got_picture, &pkt);  //h264解码,从pkt解到picture1	
 		
-		avpicture_fill((AVPicture*)pic_BGR2, (uint8_t*)bgrImg1->imageData, PIX_FMT_BGR24, c->width, c->height);          //此处修改bgrimg1为c1，解决上述bug ,初始化？				
-		sws_scale(swc_YUV2BGR, picture1->data, picture1->linesize, 0, c->height, pic_BGR2->data, pic_BGR2->linesize);  //yuv2rgb, picture1->pic_BGR2
+		avpicture_fill((AVPicture*)pic_BGR2, (uint8_t*)bgrImg1->imageData, PIX_FMT_BGR24, iColorWidth, iColorHeight);          //此处修改bgrimg1为c1，解决上述bug ,初始化？				
+		sws_scale(swc_YUV2BGR, picture1->data, picture1->linesize, 0, iColorHeight, pic_BGR2->data, pic_BGR2->linesize);  //yuv2rgb, picture1->pic_BGR2
 		//int64_t a = pic_BGR2->pts;
 		//printf("%I64d", pic_BGR->pts);//
 		/*TRACE("wewe:%I64d", a);
 		TRACE("\n");*/
-		avpicture_layout((AVPicture*)pic_BGR2, PIX_FMT_BGR24, bgrImg1->width, bgrImg1->height, (uchar*)bgrImg1->imageData, bgrImg1->imageSize);  //copy data from avpicture into buffer,pic_BGR->bgrImg1
+		avpicture_layout((AVPicture*)pic_BGR2, PIX_FMT_BGR24, iColorWidth, iColorHeight, (uchar*)bgrImg1->imageData, bgrImg1->imageSize);  //copy data from avpicture into buffer,pic_BGR->bgrImg1
 		
 		//av_frame_free(&pic_BGR);
 		/*if (NULL != pkt.data)
