@@ -143,6 +143,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
         pkt.size = 0;  
 		pkt.pts = AV_NOPTS_VALUE;
 		pkt.dts = AV_NOPTS_VALUE;
+		
         //fflush(stdout);//
 
 		DWORD start_time = GetTickCount(); //¼ÆÊ±
@@ -195,6 +196,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 			//-----------
 			
 			//m_rtpTransport.SendRtpPacket(pkt.data, pkt.size );
+			pkt.pts = frame->pts;
 			pkt.data[pkt.size] = 0x01;
 			m_rtpTransport.SendRtpPacket(pkt.data, pkt.size + 1);
 			/*Sleep(20);
