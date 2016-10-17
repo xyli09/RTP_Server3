@@ -16,6 +16,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.ipch
+*.tlog
+*.sdf
+*.opensdf
 
 # =========================
 # Operating System Files
