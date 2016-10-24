@@ -35,7 +35,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -72,14 +72,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include;D:\eigen3.28;C:\Program Files %28x86%29\ZED SDK\include;D:\opencv\build\include\opencv;C:\jrtplib\include\jrtplib3;C:\jthread\include\jthread;C:\ffmpeg_140924\include;D:\opencv\build\include\opencv2;D:\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64;C:\Program Files %28x86%29\ZED SDK\lib;C:\jrtplib\lib;C:\jthread\lib;C:\ffmpeg_140924\lib;D:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\opencv\build\include\opencv;D:\3rdparty\jrtplib\include\jrtplib3;D:\3rdparty\jthread\include\jthread;D:\3rdparty\ffmpeg-3.1.4-win32-dev\include;D:\opencv\build\include\opencv2;D:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\3rdparty\jrtplib\lib;D:\3rdparty\jthread\lib;D:\3rdparty\ffmpeg-3.1.4-win32-dev\lib;D:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include;D:\eigen3.28;C:\Program Files %28x86%29\ZED SDK\include;D:\opencv\build\include\opencv;C:\jrtplib\include\jrtplib3;C:\jthread\include\jthread;C:\ffmpeg_140924\include;D:\opencv\build\include\opencv2;D:\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64;C:\Program Files %28x86%29\ZED SDK\lib;C:\jrtplib\lib;C:\jthread\lib;C:\ffmpeg_140924\lib;D:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\opencv\build\include\opencv;C:\jrtplib\include\jrtplib3;C:\jthread\include\jthread;D:\3rdparty\ffmpeg_140924\include;D:\opencv\build\include\opencv2;D:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\jrtplib\lib;C:\jthread\lib;D:\3rdparty\ffmpeg_140924\lib;D:\opencv\build\x86\vc12\lib;$(LibraryPath)</LibraryPath>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;jrtplib_d.lib;jthread_d.lib;jrtplib.lib;jthread.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d2410d.lib;opencv_contrib2410d.lib;opencv_core2410d.lib;opencv_features2d2410d.lib;opencv_flann2410d.lib;opencv_gpu2410d.lib;opencv_highgui2410d.lib;opencv_legacy2410d.lib;opencv_ml2410d.lib;opencv_nonfree2410d.lib;opencv_objdetect2410d.lib;opencv_ocl2410d.lib;opencv_photo2410d.lib;opencv_stitching2410d.lib;opencv_superres2410d.lib;opencv_ts2410d.lib;opencv_video2410d.lib;opencv_imgproc2410d.lib;sl_zed64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;jrtplib_d.lib;jthread_d.lib;jrtplib.lib;jthread.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d2410d.lib;opencv_contrib2410d.lib;opencv_core2410d.lib;opencv_features2d2410d.lib;opencv_flann2410d.lib;opencv_gpu2410d.lib;opencv_highgui2410d.lib;opencv_legacy2410d.lib;opencv_ml2410d.lib;opencv_nonfree2410d.lib;opencv_objdetect2410d.lib;opencv_ocl2410d.lib;opencv_photo2410d.lib;opencv_stitching2410d.lib;opencv_superres2410d.lib;opencv_ts2410d.lib;opencv_video2410d.lib;opencv_imgproc2410d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -194,13 +194,13 @@
   <ItemGroup>
     <ClInclude Include="CvvImage.h" />
     <ClInclude Include="H264Coder.h" />
+    <ClInclude Include="ImgSerialize.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RtpTransport.h" />
     <ClInclude Include="RTP_3Camera_Sever.h" />
     <ClInclude Include="RTP_3Camera_SeverDlg.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="ZedImg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CvvImage.cpp" />

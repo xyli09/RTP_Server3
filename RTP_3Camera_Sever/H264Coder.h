@@ -3,7 +3,11 @@
 #include<opencv\cv.h>  
 #include<opencv\highgui.h>
 
-
+#include "windows.h"
+#include <string>
+#include <cstring>
+#include <tchar.h>
+#include <iostream>
 extern "C"
 {
 
@@ -20,7 +24,7 @@ extern "C"
 
 #pragma comment(lib,"avcodec.lib")
 #pragma comment(lib,"avutil.lib")
-	//#pragma comment(lib,"swscale.lib")
+#pragma comment(lib,"swscale.lib")
 
 }
 /////camera/////////////////////////////////////////////
@@ -49,7 +53,6 @@ extern "C"
 #define MODE 0
 /////camera//////////////////////////////////////////////
 
-
 class CH264Coder
 {
 public:
@@ -60,6 +63,7 @@ public:
 	void SendNalBuffer();
 	void enCodeTransition( int codec_id, unsigned char ID );
 	void InitCamera();
+	int shmem();
 	
 private:
 	int FindStartCode (unsigned char *Buf, int zeros_in_startcode);
@@ -71,6 +75,7 @@ private:
 	AVCodec *codec;			  /* 编解码CODEC*/
 	AVCodecContext *c;		  /* 编解码CODEC context*/
 	AVFrame *picture;		  /* 解码后的图像*/	
+	IplImage *image_src;    //从内存中读取的图像
 
 	
 

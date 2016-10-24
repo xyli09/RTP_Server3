@@ -1,16 +1,28 @@
-﻿Build started 2016/10/17 13:56:53.
+﻿Build started 2016/10/24 11:07:02.
      1>Project "D:\project\RTP_3Camera_Sever_m\RTP_Server3\RTP_3Camera_Sever\RTP_3Camera_Sever.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\RTP_3Camera_Sever.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt H264Coder.cpp
          H264Coder.cpp
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(25): warning C4101: 'y' : unreferenced local variable
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(25): warning C4101: 'x' : unreferenced local variable
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(25): warning C4101: 'i' : unreferenced local variable
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(198): warning C4101: 'nBufLen' : unreferenced local variable
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(357): warning C4101: 'nalLen' : unreferenced local variable
-     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(363): warning C4101: 'avPkt' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(211): warning C4996: 'avpicture_fill': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(5391) : see declaration of 'avpicture_fill'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(217): warning C4996: 'avcodec_encode_video2': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(5261) : see declaration of 'avcodec_encode_video2'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(224): warning C4996: 'avcodec_decode_video2': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(4753) : see declaration of 'avcodec_decode_video2'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(226): warning C4996: 'avpicture_fill': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(5391) : see declaration of 'avpicture_fill'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(228): warning C4996: 'avpicture_layout': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(5398) : see declaration of 'avpicture_layout'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(264): warning C4996: 'av_free_packet': was declared deprecated
+                 d:\3rdparty\ffmpeg-3.1.4-win32-dev\include\libavcodec\avcodec.h(4414) : see declaration of 'av_free_packet'
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(58): warning C4101: 'y' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(58): warning C4101: 'x' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(58): warning C4101: 'i' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(244): warning C4101: 'nBufLen' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(399): warning C4101: 'nalLen' : unreferenced local variable
+     1>d:\project\rtp_3camera_sever_m\rtp_server3\rtp_3camera_sever\h264coder.cpp(405): warning C4101: 'avPkt' : unreferenced local variable
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.exe" /INCREMENTAL /NOLOGO avcodec.lib avdevice.lib avfilter.lib avformat.lib avutil.lib jrtplib_d.lib jthread_d.lib jrtplib.lib jthread.lib postproc.lib swresample.lib swscale.lib opencv_calib3d2410d.lib opencv_contrib2410d.lib opencv_core2410d.lib opencv_features2d2410d.lib opencv_flann2410d.lib opencv_gpu2410d.lib opencv_highgui2410d.lib opencv_legacy2410d.lib opencv_ml2410d.lib opencv_nonfree2410d.lib opencv_objdetect2410d.lib opencv_ocl2410d.lib opencv_photo2410d.lib opencv_stitching2410d.lib opencv_superres2410d.lib opencv_ts2410d.lib opencv_video2410d.lib opencv_imgproc2410d.lib sl_zed64.lib /MANIFEST:NO /DEBUG /PDB:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.lib" /MACHINE:X86 Debug\RTP_3Camera_Sever.res
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.exe" /INCREMENTAL /NOLOGO avcodec.lib avdevice.lib avfilter.lib avformat.lib avutil.lib jrtplib_d.lib jthread_d.lib jrtplib.lib jthread.lib postproc.lib swresample.lib swscale.lib opencv_calib3d2410d.lib opencv_contrib2410d.lib opencv_core2410d.lib opencv_features2d2410d.lib opencv_flann2410d.lib opencv_gpu2410d.lib opencv_highgui2410d.lib opencv_legacy2410d.lib opencv_ml2410d.lib opencv_nonfree2410d.lib opencv_objdetect2410d.lib opencv_ocl2410d.lib opencv_photo2410d.lib opencv_stitching2410d.lib opencv_superres2410d.lib opencv_ts2410d.lib opencv_video2410d.lib opencv_imgproc2410d.lib /MANIFEST:NO /DEBUG /PDB:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\project\RTP_3Camera_Sever_m\RTP_Server3\Debug\RTP_3Camera_Sever.lib" /MACHINE:X86 Debug\RTP_3Camera_Sever.res
          Debug\CvvImage.obj
          Debug\H264Coder.obj
          Debug\RtpTransport.obj
@@ -22,4 +34,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.20
+Time Elapsed 00:00:02.51

@@ -42,7 +42,7 @@
     <ClInclude Include="CvvImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ZedImg.h">
+    <ClInclude Include="ImgSerialize.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

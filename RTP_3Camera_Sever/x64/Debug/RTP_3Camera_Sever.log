@@ -1,4 +1,4 @@
-﻿Build started 2016/10/17 10:34:12.
+﻿Build started 2016/10/21 15:50:33.
      1>Project "D:\project\RTP_3Camera_Sever_m\RTP_Server3\RTP_3Camera_Sever\RTP_3Camera_Sever.vcxproj" on node 2 (Rebuild target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl- /Od /D WIN32 /D _WINDOWS /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"x64\Debug\RTP_3Camera_Sever.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt stdafx.cpp
@@ -14,9 +14,9 @@
      1>H264Coder.cpp(25): warning C4101: 'y' : unreferenced local variable
      1>H264Coder.cpp(25): warning C4101: 'x' : unreferenced local variable
      1>H264Coder.cpp(25): warning C4101: 'i' : unreferenced local variable
-     1>H264Coder.cpp(192): warning C4101: 'nBufLen' : unreferenced local variable
-     1>H264Coder.cpp(351): warning C4101: 'nalLen' : unreferenced local variable
-     1>H264Coder.cpp(357): warning C4101: 'avPkt' : unreferenced local variable
+     1>H264Coder.cpp(198): warning C4101: 'nBufLen' : unreferenced local variable
+     1>H264Coder.cpp(357): warning C4101: 'nalLen' : unreferenced local variable
+     1>H264Coder.cpp(363): warning C4101: 'avPkt' : unreferenced local variable
          CvvImage.cpp
          Generating Code...
        ResourceCompile:
@@ -34,4 +34,4 @@
 
 Build FAILED.
 
-Time Elapsed 00:00:11.27
+Time Elapsed 00:00:12.24

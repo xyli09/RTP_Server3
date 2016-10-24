@@ -4,8 +4,9 @@
 #include <opencv2/highgui/highgui.hpp> 
 #include <opencv2/opencv.hpp>  
 //#include "afxdialogex.h"
-#include "windows.h"
-
+#include "ImgSerialize.h"
+#define gWidth 1280
+#define gHeight 720
 CH264Coder::CH264Coder(void)
 {
 	capture = cvCaptureFromCAM(-1);
@@ -16,16 +17,48 @@ CH264Coder::~CH264Coder(void)
 {
 }
 
+int CH264Coder::shmem()
+{
+	wchar_t* str = L"ShareMemory";
+	std::string strMapName("ShareMemory");                // 内存映射对象名称	
+	LPVOID pBuffer;                                    // 共享内存指针
+
+	// 首先试图打开一个命名的内存映射文件对象  
+	HANDLE hMap = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, 0,str);
+	if (NULL != hMap)
+	{ 	
+		// 打开成功，映射对象的一个视图，得到指向共享内存的指针，显示出里面的数据
+		pBuffer = ::MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+		IplImage *img;
+		cv::namedWindow("main22", cv::WINDOW_AUTOSIZE);
+		while (true)
+		{
+			img = imgc::getImgFromByte((char*)pBuffer, 10);
+			cvShowImage("main22", img);
+			cv::waitKey(20);
+			cout << "读取共享内存数据" << endl;
+		}
+	}
+
+	getchar();            // 注意，进程关闭后，所有句柄自动关闭，所以要在这里暂停
+
+	// 解除文件映射，关闭内存映射文件对象句柄
+	::UnmapViewOfFile(pBuffer);
+	::CloseHandle(hMap);
+	system("pause");
+	return 0;
+}
+
 
 void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 {
-	
+	//shmem();
     AVCodec *codec;  
     AVCodecContext *c= NULL;  
     int i, ret, x, y, got_output;  
-	int iColorWidth =  1280;
-	int iColorHeight =  720;
-
+	int iColorWidth =  gWidth;
+	int iColorHeight =  gHeight;
+	IplImage* img;
     AVFrame *frame;  
     AVPacket pkt;  
     //uint8_t endcode[] = { 0, 0, 1, 0xb7 };//文件的结尾 要写的几个字节。  
@@ -44,15 +77,27 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     }
 	
 	
-	/////////////////////camera//////////////////////////////
-	//camera//////////////
-	IplImage* img;// = cvLoadImage("hello.jpg");//cv接口。
-	InitCamera();
-	img = cvQueryFrame(capture);
-		
+	//---------------share-camera-s----------
+	wchar_t* str = L"ShareMemory";
+	
+	LPVOID pBuffer;                                    // 共享内存指针
+
+	// 首先试图打开一个命名的内存映射文件对象  
+	HANDLE hMap = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, 0, str);
+	if (NULL != hMap)
+	{
+		// 打开成功，映射对象的一个视图，得到指向共享内存的指针，显示出里面的数据
+		pBuffer = ::MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);		
+		//cv::namedWindow("shareImg", cv::WINDOW_AUTOSIZE);		
+	}
+	//---------------share-camera-e----------
+	//-----------------cv-camera-s---------------	
+	/*InitCamera();
+	img = cvQueryFrame(capture);*/
+	//-----------------cv-camera-e-----------------	
 	//-----------initial encode para---------start
     /* put sample parameters */  
-    c->bit_rate = 400000;  
+	c->bit_rate =  400000;
     /* resolution must be a multiple of two */  
     //c->width  = uiWidth;  
     //c->height = uiHeight;//影片的宽度和高度  
@@ -65,12 +110,15 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     c->max_b_frames=0;  
     c->pix_fmt = AV_PIX_FMT_YUV420P;//影片的编码格式，这是4：2：0的yuv格式。  
   
-    if(codec_id == AV_CODEC_ID_H264)
-        av_opt_set(c->priv_data, "superfast", "zerolatency", 0);          //对编码速度有影响
-	//av_opt_set(c->priv_data, "preset", "slow", 0);          //对编码速度有影响
-	/*av_opt_set(c->priv_data, "preset", "ultrafast", 0);
-    av_opt_set(c->priv_data, "tune","stillimage,fastdecode,zerolatency",0);
-    av_opt_set(c->priv_data, "x264opts","crf=26:vbv-maxrate=728:vbv-bufsize=364:keyint=25",0);*/
+	if (codec_id == AV_CODEC_ID_H264)
+	{
+		//av_opt_set(c->priv_data, "superfast", "zerolatency", 0);   //对编码速度有影响
+		//av_opt_set(c->priv_data, "preset", "slow", 0);          //对编码速度有影响
+		av_opt_set(c->priv_data, "preset", "ultrafast", 0);     //对编码速度有影响
+		//av_opt_set(c->priv_data, "tune","stillimage,fastdecode,zerolatency",0);
+		//av_opt_set(c->priv_data, "x264opts","crf=26:vbv-maxrate=728:vbv-bufsize=364:keyint=25",0);  //
+	}
+       
   
     /* open it */  
     if (avcodec_open2(c, codec, NULL) < 0) {//打开这个H264<strong>解码</strong>器  
@@ -78,8 +126,8 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
         exit(1);  
     }  
   
-	AVFrame* pic_BGR = avcodec_alloc_frame();
-	SwsContext* swc_BGR2YUV = sws_getContext(iColorWidth, iColorHeight, PIX_FMT_BGR24, iColorWidth, iColorHeight, PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
+	AVFrame* pic_BGR = av_frame_alloc();// avcodec_alloc_frame();
+	SwsContext* swc_BGR2YUV = sws_getContext(iColorWidth, iColorHeight, AV_PIX_FMT_BGR24, iColorWidth, iColorHeight, AV_PIX_FMT_YUV420P, SWS_POINT, NULL, NULL, NULL);
 	//-----------initial encode para---------end
 	//-----------initial decode para-------------start	
 	//avcodec_register_all();
@@ -87,7 +135,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 	int  consumed_bytes; /*解码器消耗的码流长度*/
 	int cnt = 0;
 	/*查找 H264 CODEC*/
-	codec = avcodec_find_decoder(CODEC_ID_H264);
+	codec = avcodec_find_decoder(AV_CODEC_ID_H264);
 	if (!codec)
 		return;
 	AVCodecContext *c1;
@@ -105,14 +153,14 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		return;
 
 	//int i;
-	AVFrame * picture1 = avcodec_alloc_frame();
+	AVFrame * picture1 = av_frame_alloc();// avcodec_alloc_frame();
 	static IplImage* bgrImg1 = cvCreateImage(cvSize(iColorWidth, iColorHeight), IPL_DEPTH_8U, 3);  //有问题，不能有效传递长宽
 	if (!picture1)
 		return;
-	AVFrame* pic_BGR2 = avcodec_alloc_frame();
-	SwsContext* swc_YUV2BGR = sws_getContext(iColorWidth, iColorHeight, PIX_FMT_YUV420P, iColorWidth, iColorHeight, PIX_FMT_BGR24, SWS_POINT, NULL, NULL, NULL); //init swscontext
+	AVFrame* pic_BGR2 = av_frame_alloc();// avcodec_alloc_frame();
+	SwsContext* swc_YUV2BGR = sws_getContext(iColorWidth, iColorHeight, AV_PIX_FMT_YUV420P, iColorWidth, iColorHeight, AV_PIX_FMT_BGR24, SWS_POINT, NULL, NULL, NULL); //init swscontext
 	//------------initial decode para------------end
-    frame = avcodec_alloc_frame();//给frame结构体分配内存。，但并为给frame->data分配内存。  
+	frame = av_frame_alloc();// avcodec_alloc_frame();//给frame结构体分配内存。，但并为给frame->data分配内存。  
     if (!frame) {  
         AfxMessageBox(_T("Could not allocate video frame\n"));  
         exit(1);  
@@ -134,33 +182,35 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 	unsigned int count=0;  //pts 计数
 	cv::Size displaySize(iColorWidth, iColorHeight);	
 	cv::Mat mat2;
-	cv::Mat matout(displaySize, CV_8UC4);
+	cv::Mat tmatout(displaySize, CV_8UC4);
     /* encode YUV */  
     while(true) //这里写入200帧的数据。200/25=8,,,因此产生了8s的影片。
 	{
-		img = cvQueryFrame(capture);
+		img = imgc::getImgFromByte((char*)pBuffer, 10); //将共享内存字节转为图像
+		//cvShowImage("shareImg", img);
+		//cv::waitKey(20);
+		//img = cvQueryFrame(capture);       //从cv相机获取图像
 		mat2 = img;
-		cv::resize(mat2, matout, displaySize,0,0,2);
+		cv::imshow("matimg1", mat2);
+		cv::resize(mat2, tmatout, displaySize,0,0,2);
+		cv::Mat matout;
+		matout = tmatout.clone();
+		cv::imshow("matimg", matout);
+		//matout = img;
 		EnterCriticalSection(&CriticalSection);
 
-		//-----------encode start
+		//-----------encode start-
         av_init_packet(&pkt);//自然初始化了，  
         pkt.data = NULL;    // packet data will be allocated by the encoder、、如果没有这个=null这个，会在vs中产生0xdddddddd错误。  
         pkt.size = 0;  
 		pkt.pts = AV_NOPTS_VALUE;
-		pkt.dts = AV_NOPTS_VALUE;
-		
-        //fflush(stdout);//
+		pkt.dts = AV_NOPTS_VALUE;        
 
-		DWORD start_time = GetTickCount(); //计时
-		
+		DWORD start_time = GetTickCount(); //计时		
 
-		avpicture_fill((AVPicture*)pic_BGR, (uint8_t*)matout.data, PIX_FMT_BGR24, iColorWidth, iColorHeight);               //img->pic_BGR
+		avpicture_fill((AVPicture*)pic_BGR, (uint8_t*)matout.data, AV_PIX_FMT_BGR24, iColorWidth, iColorHeight);               //img->pic_BGR		
+		sws_scale(swc_BGR2YUV, pic_BGR->data, pic_BGR->linesize, 0, iColorHeight, frame->data, frame->linesize);   //rgb转yuv，从pic_BGR到frame			
 		
-		sws_scale(swc_BGR2YUV, pic_BGR->data, pic_BGR->linesize, 0, iColorHeight, frame->data, frame->linesize);   //rgb转yuv，从pic_BGR到frame		
-
-		
-		//delete [] imageConverted.pData;
          frame->pts=count;
 		 count++;
         /* encode the image */  		
@@ -173,13 +223,9 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		//--------decode-------start		
 		consumed_bytes = avcodec_decode_video2(c1, picture1, &got_picture, &pkt);  //h264解码,从pkt解到picture1	
 		
-		avpicture_fill((AVPicture*)pic_BGR2, (uint8_t*)bgrImg1->imageData, PIX_FMT_BGR24, iColorWidth, iColorHeight);          //此处修改bgrimg1为c1，解决上述bug ,初始化？				
-		sws_scale(swc_YUV2BGR, picture1->data, picture1->linesize, 0, iColorHeight, pic_BGR2->data, pic_BGR2->linesize);  //yuv2rgb, picture1->pic_BGR2
-		//int64_t a = pic_BGR2->pts;
-		//printf("%I64d", pic_BGR->pts);//
-		/*TRACE("wewe:%I64d", a);
-		TRACE("\n");*/
-		avpicture_layout((AVPicture*)pic_BGR2, PIX_FMT_BGR24, iColorWidth, iColorHeight, (uchar*)bgrImg1->imageData, bgrImg1->imageSize);  //copy data from avpicture into buffer,pic_BGR->bgrImg1
+		avpicture_fill((AVPicture*)pic_BGR2, (uint8_t*)bgrImg1->imageData, AV_PIX_FMT_BGR24, iColorWidth, iColorHeight);          //此处修改bgrimg1为c1，解决上述bug ,初始化？				
+		sws_scale(swc_YUV2BGR, picture1->data, picture1->linesize, 0, iColorHeight, pic_BGR2->data, pic_BGR2->linesize);  //yuv2rgb, picture1->pic_BGR2		
+		avpicture_layout((AVPicture*)pic_BGR2, AV_PIX_FMT_BGR24, iColorWidth, iColorHeight, (uchar*)bgrImg1->imageData, bgrImg1->imageSize);  //copy data from avpicture into buffer,pic_BGR->bgrImg1
 		
 		//av_frame_free(&pic_BGR);
 		/*if (NULL != pkt.data)
@@ -198,9 +244,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		int nBufLen;
 		if( got_output )
 		{
-
-			//-----------
-			
+			//-----------			
 			//m_rtpTransport.SendRtpPacket(pkt.data, pkt.size );
 			pkt.pts = frame->pts;
 			pkt.data[pkt.size] = 0x01;
@@ -219,13 +263,11 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 			
 			av_free_packet(&pkt);
 		}
-		LeaveCriticalSection(&CriticalSection);    //unlock
-		//Sleep(50);
-
-		
-
-
+		LeaveCriticalSection(&CriticalSection);    //unlock		//Sleep(50);
     }
+	//相关洗地工作-------------
+	::UnmapViewOfFile(pBuffer);
+	::CloseHandle(hMap);
 	av_frame_free(&pic_BGR);
 	av_frame_free(&pic_BGR2);
 	sws_freeContext(swc_YUV2BGR);	
@@ -287,7 +329,7 @@ bool CH264Coder::InitDecoder()
 	avcodec_register_all(); 
 
 	/*查找 H264 CODEC*/
-	codec = avcodec_find_decoder(CODEC_ID_H264);
+	codec = avcodec_find_decoder(AV_CODEC_ID_H264);
 
 	if (!codec) 
 		return 0; 
@@ -303,7 +345,7 @@ bool CH264Coder::InitDecoder()
 		return 0;  
 
 	/*为AVFrame申请空间，并清零*/
-	picture   = avcodec_alloc_frame();
+	picture = av_frame_alloc();// avcodec_alloc_frame();
 
 	if(!picture) 	
 		return 0;
