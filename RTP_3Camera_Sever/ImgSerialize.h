@@ -188,4 +188,60 @@ namespace imgc{
 		cv::waitKey(20);
 	}
 	//----------------------my function end----------------------------------------------
+	//--------check fun--s
+	//unsigned char ID = 0x01;
+	char ID = 0xff;
+	bool checkMem(char* ptr)
+	{
+		char tempid = ID + 1;
+		char readData = ptr[0];
+		bool re = false;
+		if (readData == tempid)
+		{
+			re = true;
+			ID = tempid;
+		}
+		else
+		{
+			re = false;
+		}
+		return re;
+	}
+
+	bool checkStatus(char *ptr)
+	{
+		bool re = false;
+		unsigned char a = ptr[0];
+		return re = ptr[0] == 0x01 ? true : false;
+	}
+
+
+	char *processChar(char* arr, int len)
+	{
+		char *newArr = (char*)malloc(len + 1);
+		newArr[0] = ID;
+		int i = 0;
+		for (i = 0; i < len; i++)
+		{
+			newArr[i + 1] = arr[i];
+		}
+		free(arr);
+		return newArr;
+
+	}
+
+
+	int setMem(char* ptr)
+	{
+		char* check = (char*)malloc(1);
+		check[0] = 0xff;
+		memcpy(ptr, check, 1);
+		//ID++;
+		return 0;
+	}
+	char* getValueChar(char* arr)
+	{
+		return &arr[1];
+	}
+	//-------------check fun--e
 }

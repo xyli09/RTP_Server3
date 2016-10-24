@@ -89,6 +89,7 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
 		// 打开成功，映射对象的一个视图，得到指向共享内存的指针，显示出里面的数据
 		pBuffer = ::MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);		
 		//cv::namedWindow("shareImg", cv::WINDOW_AUTOSIZE);		
+		imgc::setMem((char*)pBuffer);//设置写状态,第一次准备
 	}
 	//---------------share-camera-e----------
 	//-----------------cv-camera-s---------------	
@@ -186,16 +187,20 @@ void CH264Coder::enCodeTransition( int codec_id, unsigned char ID )
     /* encode YUV */  
     while(true) //这里写入200帧的数据。200/25=8,,,因此产生了8s的影片。
 	{
-		img = imgc::getImgFromByte((char*)pBuffer, 10); //将共享内存字节转为图像
+		
+		if (!imgc::checkStatus((char*)pBuffer))
+			continue;
+		img = imgc::getImgFromByte(imgc::getValueChar((char*)pBuffer), 10); //将共享内存字节转为图像
 		//cvShowImage("shareImg", img);
 		//cv::waitKey(20);
 		//img = cvQueryFrame(capture);       //从cv相机获取图像
 		mat2 = img;
-		cv::imshow("matimg1", mat2);
+		//cv::imshow("matimg1", mat2);
 		cv::resize(mat2, tmatout, displaySize,0,0,2);
 		cv::Mat matout;
 		matout = tmatout.clone();
 		cv::imshow("matimg", matout);
+		imgc::setMem((char*)pBuffer);//设置写状态
 		//matout = img;
 		EnterCriticalSection(&CriticalSection);
 
